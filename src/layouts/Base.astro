@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import Header from '../components/Header.astro';
+import Cursor from '../components/Cursor.astro';
 
 interface Props { title?: string; description?: string }
 const {
@@ -21,6 +22,7 @@ const {
   <body>
     <Header />
     <slot />
+    <Cursor />
     <script>
       const io = new IntersectionObserver((entries) => {
         for (const e of entries) if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }

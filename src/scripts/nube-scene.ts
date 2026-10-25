@@ -71,54 +71,6 @@ function canvasTexture(w: number, h: number, draw: (ctx: CanvasRenderingContext2
   return t;
 }
 
-/** Íconos de los hitos sobre la cinta (dibujados a mano, sin fuentes). */
-function iconTexture(kind: number) {
-  return canvasTexture(128, 128, (ctx) => {
-    const cy = PALETTE.cyan;
-    ctx.fillStyle = 'rgba(7,17,57,.78)';
-    ctx.strokeStyle = cy;
-    ctx.lineWidth = 6;
-    ctx.shadowColor = cy;
-    ctx.shadowBlur = 14;
-    ctx.beginPath();
-    ctx.roundRect(14, 14, 100, 100, 12);
-    ctx.fill();
-    ctx.stroke();
-    ctx.lineWidth = 7;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    if (kind === 0) {
-      // tijera (corte)
-      ctx.arc(46, 82, 11, 0, Math.PI * 2);
-      ctx.moveTo(93, 82);
-      ctx.arc(82, 82, 11, 0, Math.PI * 2);
-      ctx.moveTo(53, 73); ctx.lineTo(90, 36);
-      ctx.moveTo(75, 73); ctx.lineTo(38, 36);
-    } else if (kind === 1) {
-      // destello (motion)
-      ctx.moveTo(64, 30);
-      ctx.quadraticCurveTo(68, 60, 98, 64);
-      ctx.quadraticCurveTo(68, 68, 64, 98);
-      ctx.quadraticCurveTo(60, 68, 30, 64);
-      ctx.quadraticCurveTo(60, 60, 64, 30);
-    } else if (kind === 2) {
-      // corazón (redes)
-      ctx.moveTo(64, 94);
-      ctx.bezierCurveTo(24, 66, 32, 34, 52, 36);
-      ctx.bezierCurveTo(60, 37, 64, 44, 64, 48);
-      ctx.bezierCurveTo(64, 44, 68, 37, 76, 36);
-      ctx.bezierCurveTo(96, 34, 104, 66, 64, 94);
-    } else {
-      // rueda de color
-      ctx.arc(64, 64, 30, 0, Math.PI * 2);
-      ctx.moveTo(64, 34); ctx.lineTo(64, 94);
-      ctx.moveTo(38, 49); ctx.lineTo(90, 79);
-      ctx.moveTo(38, 79); ctx.lineTo(90, 49);
-    }
-    ctx.stroke();
-  });
-}
-
 function softDotTexture() {
   return canvasTexture(64, 64, (ctx) => {
     const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
@@ -265,7 +217,7 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
     uniforms: {
       uOffset: { value: 0 }, uTime: { value: 0 }, uSunDir: { value: sunDir },
       cLow: C(PALETTE.indigo), cMid: C(PALETTE.violet), cHigh: C('#6b3fa8'), cSnow: C(PALETTE.lavender),
-      cRim: C(PALETTE.magenta), cCyan: C(PALETTE.cyan), cRiver: C(PALETTE.coral), cRiverHi: C(PALETTE.gold),
+      cRim: C(PALETTE.magenta), cCyan: C(PALETTE.cyan),
       cCity: C(PALETTE.peach), cFogLow: C(PALETTE.rose), cFogHigh: C(PALETTE.magenta),
     },
     vertexShader: /* glsl */ `
@@ -289,7 +241,7 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
       }`,
     fragmentShader: /* glsl */ `
       uniform float uTime; uniform vec3 uSunDir;
-      uniform vec3 cLow, cMid, cHigh, cSnow, cRim, cCyan, cRiver, cRiverHi, cCity, cFogLow, cFogHigh;
+      uniform vec3 cLow, cMid, cHigh, cSnow, cRim, cCyan, cCity, cFogLow, cFogHigh;
       varying vec3 vWorld; varying vec2 vQ; varying float vH; varying float vValley;
       ${NOISE}
       void main(){
@@ -305,24 +257,19 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
 
         float floorMask = 1.0 - smoothstep(0.0, 0.2, vValley);
         float d = abs(vWorld.x - riverX(vQ.y));
-        float river = 1.0 - smoothstep(1.3, 1.9, d);
 
         // grilla neón en el fondo del valle
         vec2 gq = vQ * 0.5;
         vec2 g = abs(fract(gq) - 0.5) / fwidth(gq);
         float line = 1.0 - clamp(min(g.x, g.y), 0.0, 1.0);
-        col = mix(col, cCyan, line * floorMask * (1.0 - river) * 0.35);
-
-        // río que refleja el atardecer
-        float sh = noise(vec2(vQ.x * 0.9, vQ.y * 3.0 + uTime * 1.5));
-        col = mix(col, mix(cRiver, cRiverHi, step(0.62, sh)), river * floorMask);
+        col = mix(col, cCyan, line * floorMask * 0.35);
 
         // luces del pueblo
         vec2 cell = floor(vQ * 1.4);
         float hh = hash(cell);
         float dotm = 1.0 - smoothstep(0.12, 0.3, length(fract(vQ * 1.4) - 0.5));
         float near = 1.0 - smoothstep(3.0, 11.0, d);
-        col += cCity * step(0.955, hh) * dotm * floorMask * (1.0 - river) * near * (0.9 + 0.5 * sin(uTime * 3.0 + hh * 60.0)) * 1.6;
+        col += cCity * step(0.955, hh) * dotm * floorMask * near * (0.9 + 0.5 * sin(uTime * 3.0 + hh * 60.0)) * 1.6;
 
         float dist = length(vWorld - cameraPosition);
         float fog = smoothstep(45.0, 160.0, dist);
@@ -716,88 +663,6 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
     tv.add(foot);
   });
 
-  /* ---------------- cinta de película (la ruta) ---------------- */
-  const route = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0.4, -0.6, -0.4), new THREE.Vector3(-1.8, -1.5, -4), new THREE.Vector3(1.4, -2.4, -9),
-    new THREE.Vector3(-2.6, -2.9, -15), new THREE.Vector3(2.2, -3.1, -23), new THREE.Vector3(-1.4, -3.3, -34),
-    new THREE.Vector3(0.6, -3.4, -50),
-  ]);
-  const routeLen = route.getLength();
-  const ribbonGeo = (() => {
-    const n = 500, w = 0.62;
-    const pos: number[] = [], uv: number[] = [], idx: number[] = [];
-    const up = new THREE.Vector3(0, 1, 0), side = new THREE.Vector3();
-    for (let i = 0; i <= n; i++) {
-      const u = i / n;
-      const p = route.getPointAt(u);
-      const tan = route.getTangentAt(u);
-      side.crossVectors(tan, up).normalize().multiplyScalar(w / 2);
-      pos.push(p.x - side.x, p.y + 0.001, p.z - side.z, p.x + side.x, p.y + 0.001, p.z + side.z);
-      uv.push(u * routeLen, 0, u * routeLen, 1);
-      if (i < n) idx.push(i * 2, i * 2 + 1, i * 2 + 2, i * 2 + 1, i * 2 + 3, i * 2 + 2);
-    }
-    const g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-    g.setIndex(idx);
-    return g;
-  })();
-  const ribbonMat = new THREE.ShaderMaterial({
-    transparent: true,
-    depthWrite: false,
-    side: THREE.DoubleSide,
-    uniforms: {
-      uTime: { value: 0 }, uFlow: { value: 0 }, uLen: { value: routeLen },
-      cCyan: C(PALETTE.cyan), cMint: C(PALETTE.mint), cA: C(PALETTE.magenta), cB: C(PALETTE.coral), cC: C(PALETTE.lavender), cInk: C(PALETTE.ink),
-    },
-    vertexShader: BASIC_VERT,
-    fragmentShader: /* glsl */ `
-      uniform float uTime, uFlow, uLen; uniform vec3 cCyan, cMint, cA, cB, cC, cInk; varying vec2 vUv;
-      ${NOISE}
-      void main(){
-        float s = vUv.x + uFlow;
-        float y = vUv.y;
-        float edge = step(y, 0.2) + step(0.8, y);
-        vec3 col; float a = 1.0;
-        if (edge > 0.5) {
-          float yy = y < 0.5 ? y : 1.0 - y;
-          float hole = step(0.3, fract(s * 3.0)) * step(fract(s * 3.0), 0.7) * step(0.05, yy) * step(yy, 0.15);
-          col = cCyan * 1.8;
-          a = 1.0 - hole;
-        } else {
-          float fid = floor(s / 0.7);
-          float fx = fract(s / 0.7);
-          float border = step(fx, 0.06) + step(0.94, fx) + step(y, 0.24) + step(0.76, y);
-          float h = hash(vec2(fid, 1.0));
-          vec3 fc = h < 0.33 ? cA : (h < 0.66 ? cB : cC);
-          fc = mix(fc, cInk, smoothstep(0.24, 0.76, y) * 0.5);
-          col = mix(fc * 0.9, cMint * 1.2, min(border, 1.0) * 0.7);
-        }
-        float pulse = 0.5 + 0.5 * sin(vUv.x * 0.8 - uTime * 3.0);
-        col += cCyan * pulse * 0.25;
-        a *= smoothstep(0.0, 1.2, vUv.x) * (1.0 - smoothstep(uLen * 0.55, uLen, vUv.x));
-        gl_FragColor = vec4(col, a);
-        #include <colorspace_fragment>
-      }`,
-  });
-  const ribbon = new THREE.Mesh(ribbonGeo, ribbonMat);
-  rig.add(ribbon);
-
-  // hitos (íconos) a lo largo de la ruta
-  const icons = [0.1, 0.2, 0.32, 0.46].map((u, i) => {
-    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: iconTexture(i), transparent: true, depthWrite: false }));
-    const p = route.getPointAt(u);
-    sp.position.set(p.x, p.y + 0.9, p.z);
-    sp.scale.setScalar(0.85);
-    sp.userData = { base: sp.position.y, channel: i };
-    rig.add(sp);
-    // poste luminoso
-    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.5, 6), cyanMat);
-    post.position.set(p.x, p.y + 0.25, p.z);
-    rig.add(post);
-    return sp;
-  });
-
   /* ---------------- pájaros (silueta) ---------------- */
   const birdMat = new THREE.MeshBasicMaterial({ color: PALETTE.night, side: THREE.DoubleSide });
   const wingGeo = new THREE.BufferGeometry();
@@ -849,19 +714,17 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
   const finalPass = new ShaderPass({
-    uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) }, uPixel: { value: 1 } },
+    uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) } },
     vertexShader: BASIC_VERT,
     fragmentShader: /* glsl */ `
-      uniform sampler2D tDiffuse; uniform float uTime; uniform vec2 uRes; uniform float uPixel; varying vec2 vUv;
+      uniform sampler2D tDiffuse; uniform float uTime; uniform vec2 uRes; varying vec2 vUv;
       float rand(vec2 co){ return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453); }
       void main(){
         vec2 uv = vUv;
-        if (uPixel > 1.0) uv = (floor(uv * uRes / uPixel) + 0.5) * uPixel / uRes;
         vec2 dir = uv - 0.5;
         float d = length(dir);
         vec2 off = dir * d * 0.01;
         vec3 col = vec3(texture2D(tDiffuse, uv + off).r, texture2D(tDiffuse, uv).g, texture2D(tDiffuse, uv - off).b);
-        if (uPixel > 1.0) col = floor(col * 7.0 + 0.5) / 7.0;
         col *= 1.0 - smoothstep(0.45, 1.0, d) * 0.4;
         col *= 0.97 + 0.03 * sin(vUv.y * uRes.y * 1.6);
         col += (rand(vUv * 900.0 + fract(uTime)) - 0.5) * 0.035;
@@ -929,16 +792,12 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
     pointer.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
     raycaster.setFromCamera(pointer, camera);
   };
-  const pick = () => raycaster.intersectObjects([screen, body, tube, cloud, ...icons], false)[0];
+  const pick = () => raycaster.intersectObjects([screen, body, tube, cloud], false)[0];
 
   canvas.addEventListener('pointerdown', (e) => {
     ndc(e);
     const hit = pick();
     if (!hit) return;
-    if (hit.object instanceof THREE.Sprite) {
-      setChannel(hit.object.userData.channel);
-      return;
-    }
     dragging = true;
     dragMoved = 0;
     lastX = e.clientX;
@@ -953,7 +812,7 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
       yawVel = dx * 0.006;
       yaw += yawVel;
     } else {
-      canvas.style.cursor = pick() ? 'pointer' : '';
+      document.body.classList.toggle('cursor-hot', !!pick());
     }
   });
   const endDrag = (e: PointerEvent) => {
@@ -1026,7 +885,6 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
     const speed = 5 + scrollP * 14;
     offset += dt * speed;
     terrainMat.uniforms.uOffset.value = offset;
-    ribbonMat.uniforms.uFlow.value = -offset;
 
     // cámara
     pointerSmooth.lerp(pointer, 0.05);
@@ -1063,13 +921,6 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
     cloudMat.uniforms.uScreenPos.value.copy(screenWorld).add(new THREE.Vector3(0, 0, 0.6));
     cloudMat.uniforms.uGlow.value.copy(glow);
     cloudMat.uniforms.uGlowStrength.value = 0.9 * screenMat.uniforms.uPower.value;
-
-    // íconos que flotan
-    icons.forEach((s, i) => {
-      s.position.y = s.userData.base + Math.sin(t * 1.6 + i) * 0.12;
-      const active = i === channel;
-      s.scale.setScalar(THREE.MathUtils.lerp(s.scale.x, active ? 1.15 : 0.8, 0.1));
-    });
 
     // pájaros
     birds.forEach((b) => {
@@ -1108,7 +959,7 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
       drawOSD(t);
     }
 
-    for (const m of [skyMat, starMat, sunMat, terrainMat, cloudMat, screenMat, ribbonMat]) m.uniforms.uTime.value = t;
+    for (const m of [skyMat, starMat, sunMat, terrainMat, cloudMat, screenMat]) m.uniforms.uTime.value = t;
     finalPass.uniforms.uTime.value = t;
     composer.render();
   };
@@ -1124,9 +975,6 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
     },
     onChannel(fn: (ch: number) => void) {
       listeners.add(fn);
-    },
-    setPixel(on: boolean) {
-      finalPass.uniforms.uPixel.value = on ? 5 * renderer.getPixelRatio() : 1;
     },
     setScroll(p: number) {
       scrollP = p;

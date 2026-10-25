@@ -9,7 +9,7 @@ const services = [
 <section class="section services" id="servicios">
   <p class="eyebrow reveal">Servicios</p>
   <h2 class="section__title reveal">Cuatro canales,<br />una misma nube</h2>
-  <p class="section__lede reveal">Cada servicio es un canal de nuestra tele. Elegí uno y lo sintonizamos arriba.</p>
+  <p class="section__lede reveal">Cada servicio es un canal de nuestra tele. Elegí uno y cambiá lo que se ve en la tele.</p>
   <ul class="grid">
     {services.map((s, i) => (
       <li class="reveal" style={`transition-delay:${i * 0.08}s`}>
@@ -18,7 +18,7 @@ const services = [
           <h3 class="pixel">{s.name}</h3>
           <p>{s.text}</p>
           <span class="card__tags">{s.tags.map((t) => <span>{t}</span>)}</span>
-          <span class="card__cta">Ver en la tele ↑</span>
+          <span class="card__cta">Sintonizar canal ▶</span>
         </button>
       </li>
     ))}

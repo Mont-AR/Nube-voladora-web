@@ -1,0 +1,106 @@
+<div class="cursor" aria-hidden="true">
+  <span class="cursor__dot"></span>
+  <span class="cursor__frame"><i></i><i></i><i></i><i></i></span>
+</div>
+<canvas class="cursor-trail" aria-hidden="true"></canvas>
+
+<script>
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const root = document.querySelector<HTMLElement>('.cursor')!;
+  const dot = root.querySelector<HTMLElement>('.cursor__dot')!;
+  const frame = root.querySelector<HTMLElement>('.cursor__frame')!;
+  const trail = document.querySelector<HTMLCanvasElement>('.cursor-trail')!;
+
+  if (fine) {
+    document.documentElement.classList.add('has-cursor');
+    const ctx = trail.getContext('2d')!;
+    const colors = ['#61f7e7', '#e42a9b', '#b48cff', '#ffb77e', '#fff6d9'];
+    type P = { x: number; y: number; vx: number; vy: number; life: number; size: number; c: string };
+    const parts: P[] = [];
+    let x = -100, y = -100, fx = x, fy = y, lastX = x, lastY = y;
+
+    const resize = () => {
+      trail.width = innerWidth * devicePixelRatio;
+      trail.height = innerHeight * devicePixelRatio;
+      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+      ctx.imageSmoothingEnabled = false;
+    };
+    resize();
+    addEventListener('resize', resize);
+
+    const spawn = (n: number, speed: number) => {
+      if (reduced) return;
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const v = Math.random() * speed;
+        parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - speed * 0.15, life: 1, size: 2 + Math.floor(Math.random() * 3) * 2, c: colors[(Math.random() * colors.length) | 0] });
+      }
+    };
+
+    addEventListener('pointermove', (e) => {
+      x = e.clientX; y = e.clientY;
+      root.classList.add('is-on');
+      const d = Math.hypot(x - lastX, y - lastY);
+      if (d > 14) { spawn(1 + Math.min(3, d / 30) | 0, 0.6); lastX = x; lastY = y; }
+    });
+    document.addEventListener('pointerleave', () => root.classList.remove('is-on'));
+    addEventListener('pointerdown', () => { root.classList.add('is-down'); spawn(16, 4); });
+    addEventListener('pointerup', () => root.classList.remove('is-down'));
+    document.addEventListener('pointerover', (e) => {
+      const t = e.target as Element;
+      root.classList.toggle('is-link', !!t.closest('a, button, label, select, [data-channel]'));
+      root.classList.toggle('is-text', !!t.closest('input, textarea'));
+    });
+
+    const tick = () => {
+      fx += (x - fx) * 0.22; fy += (y - fy) * 0.22;
+      dot.style.transform = `translate(${x}px, ${y}px)`;
+      frame.style.transform = `translate(${Math.round(fx)}px, ${Math.round(fy)}px)`;
+      root.classList.toggle('is-hot', document.body.classList.contains('cursor-hot'));
+
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+      for (let i = parts.length - 1; i >= 0; i--) {
+        const p = parts[i];
+        p.x += p.vx; p.y += p.vy; p.vy += 0.06; p.vx *= 0.96; p.life -= 0.022;
+        if (p.life <= 0) { parts.splice(i, 1); continue; }
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.c;
+        const s = p.size * (0.5 + p.life * 0.5);
+        ctx.fillRect(Math.round(p.x - s / 2), Math.round(p.y - s / 2), Math.ceil(s), Math.ceil(s));
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(tick);
+    };
+    tick();
+  }
+</script>
+
+<style>
+  .cursor, .cursor-trail { display: none; }
+  :global(html.has-cursor) .cursor, :global(html.has-cursor) .cursor-trail { display: block; }
+  :global(html.has-cursor), :global(html.has-cursor *) { cursor: none !important; }
+  :global(html.has-cursor input), :global(html.has-cursor textarea) { cursor: text !important; }
+
+  .cursor-trail { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 199; pointer-events: none; }
+  .cursor { position: fixed; inset: 0; z-index: 200; pointer-events: none; opacity: 0; transition: opacity .3s; }
+  .cursor.is-on { opacity: 1; }
+  .cursor.is-text { opacity: 0; }
+  .cursor__dot, .cursor__frame { position: absolute; top: 0; left: 0; }
+  .cursor__dot {
+    width: 6px; height: 6px; margin: -3px 0 0 -3px; background: var(--cyan);
+    box-shadow: 0 0 10px var(--cyan);
+  }
+  .cursor__frame { width: 0; height: 0; }
+  .cursor__frame i {
+    --s: 30px; --c: var(--cream);
+    position: absolute; width: 8px; height: 8px; border: 2px solid var(--c);
+    transition: transform .35s cubic-bezier(.22, 1, .36, 1), border-color .25s;
+  }
+  .cursor__frame i:nth-child(1) { border-right: 0; border-bottom: 0; transform: translate(calc(var(--s) / -2), calc(var(--s) / -2)); }
+  .cursor__frame i:nth-child(2) { border-left: 0; border-bottom: 0; transform: translate(calc(var(--s) / 2 - 8px), calc(var(--s) / -2)); }
+  .cursor__frame i:nth-child(3) { border-right: 0; border-top: 0; transform: translate(calc(var(--s) / -2), calc(var(--s) / 2 - 8px)); }
+  .cursor__frame i:nth-child(4) { border-left: 0; border-top: 0; transform: translate(calc(var(--s) / 2 - 8px), calc(var(--s) / 2 - 8px)); }
+  .cursor.is-link .cursor__frame i, .cursor.is-hot .cursor__frame i { --s: 46px; --c: var(--magenta); }
+  .cursor.is-down .cursor__frame i { --s: 20px; --c: var(--cyan); }
+</style>
