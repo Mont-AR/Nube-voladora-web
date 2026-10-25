@@ -20,7 +20,13 @@ const steps = [
   </ol>
 </section>
 <style>
-  .process { background: radial-gradient(120% 80% at 50% 120%, var(--violet), var(--night) 60%); overflow: hidden; }
+  /* brillo violeta en el centro y bordes del mismo color que las secciones vecinas: sin línea de corte */
+  .process {
+    overflow: hidden;
+    background:
+      radial-gradient(70% 55% at 50% 55%, rgba(67, 16, 95, .9), rgba(67, 16, 95, 0) 70%),
+      var(--night);
+  }
   .route { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; margin-top: 4rem; position: relative; }
   .route::before {
     content: ''; position: absolute; left: 0; right: 0; top: 23px; height: 4px;

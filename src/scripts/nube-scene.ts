@@ -126,15 +126,16 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
         vec3 col = mix(cHorizon, cLow, smoothstep(-0.02, 0.08, h));
         col = mix(col, cMid, smoothstep(0.06, 0.24, h));
         col = mix(col, cTop, smoothstep(0.2, 0.55, h));
-        // bancos de nubes con aspecto pixel art
+        // nubes suaves y alargadas, iluminadas desde abajo por el sol
         vec2 p = d.xz / (h + 0.18);
-        p = floor(p * 40.0) / 40.0;
-        p.x += uTime * 0.008;
-        float c = fbm(p * vec2(1.6, 4.2));
-        float band = smoothstep(0.03, 0.09, h) * (1.0 - smoothstep(0.22, 0.36, h));
-        vec3 cloud = mix(cCloudB, cCloudA, smoothstep(0.05, 0.25, h));
-        col = mix(col, cloud, step(0.6, c) * band * 0.85);
-        col = mix(col, cloud * 1.15, step(0.67, c) * band * 0.6);
+        p.x += uTime * 0.006;
+        float c = fbm(p * vec2(0.9, 2.4) + fbm(p * 1.7) * 0.6);
+        float band = smoothstep(0.02, 0.08, h) * (1.0 - smoothstep(0.22, 0.4, h));
+        float dens = smoothstep(0.48, 0.72, c) * band;
+        float lit = smoothstep(0.35, 0.0, h) * (0.6 + 0.4 * max(-d.z, 0.0));
+        vec3 cloud = mix(cCloudA, cCloudB, lit);
+        cloud = mix(cloud, cHorizon, lit * smoothstep(0.62, 0.8, c) * 0.5);
+        col = mix(col, cloud, dens * 0.8);
         gl_FragColor = vec4(col, 1.0);
         #include <colorspace_fragment>
       }`,
@@ -210,18 +211,20 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
   scene.add(sun);
 
   /* ---------------- terreno infinito (vuelo) ---------------- */
-  const terrainGeo = new THREE.PlaneGeometry(220, 170, isSmall ? 140 : 220, isSmall ? 110 : 170);
+  const terrainSegZ = isSmall ? 110 : 170;
+  const terrainStep = 170 / terrainSegZ; // distancia entre vértices en z
+  const terrainGeo = new THREE.PlaneGeometry(220, 170, isSmall ? 140 : 220, terrainSegZ);
   terrainGeo.rotateX(-Math.PI / 2);
   terrainGeo.translate(0, 0, -62);
   const terrainMat = new THREE.ShaderMaterial({
     uniforms: {
-      uOffset: { value: 0 }, uTime: { value: 0 }, uSunDir: { value: sunDir },
+      uOffset: { value: 0 }, uShift: { value: 0 }, uTime: { value: 0 }, uSunDir: { value: sunDir },
       cLow: C(PALETTE.indigo), cMid: C(PALETTE.violet), cHigh: C('#6b3fa8'), cSnow: C(PALETTE.lavender),
       cRim: C(PALETTE.magenta), cCyan: C(PALETTE.cyan),
       cCity: C(PALETTE.peach), cFogLow: C(PALETTE.rose), cFogHigh: C(PALETTE.magenta),
     },
     vertexShader: /* glsl */ `
-      uniform float uOffset;
+      uniform float uOffset; uniform float uShift;
       varying vec3 vWorld; varying vec2 vQ; varying float vH; varying float vValley;
       ${NOISE}
       void main(){
@@ -229,7 +232,7 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
         vec2 q = vec2(p.x, p.z - uOffset);
         float d = abs(p.x - riverX(q.y));
         float valley = smoothstep(3.0, 24.0, d);
-        float far = smoothstep(-15.0, -100.0, p.z);
+        float far = smoothstep(-15.0, -100.0, p.z + uShift);
         float ridges = 1.0 - abs(noise(q * 0.035) * 2.0 - 1.0);
         float h = (fbm(q * 0.05) * 0.8 + ridges * ridges * 0.7) * valley * (3.5 + far * 22.0);
         h -= 0.6 * (1.0 - valley);
@@ -884,7 +887,11 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
     // vuelo
     const speed = 5 + scrollP * 14;
     offset += dt * speed;
-    terrainMat.uniforms.uOffset.value = offset;
+    // el ruido avanza de a un vértice y la malla cubre el resto: los picos no ondulan
+    const snap = Math.floor(offset / terrainStep) * terrainStep;
+    terrainMat.uniforms.uOffset.value = snap;
+    terrainMat.uniforms.uShift.value = offset - snap;
+    terrain.position.z = offset - snap;
 
     // cámara
     pointerSmooth.lerp(pointer, 0.05);
