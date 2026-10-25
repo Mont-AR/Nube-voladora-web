@@ -1,0 +1,53 @@
+---
+const work = [
+  { t: 'Café de altura', f: 'Reel 9:16', k: 'Redes', g: 'var(--magenta), var(--coral)' },
+  { t: 'Festival Norte', f: 'Aftermovie 16:9', k: 'Edicion', g: 'var(--violet), var(--magenta)' },
+  { t: 'App Brújula', f: 'Explainer', k: 'Motion', g: 'var(--indigo), var(--cyan)' },
+  { t: 'Podcast Cumbre', f: 'Clips + shorts', k: 'Redes', g: 'var(--coral), var(--gold)' },
+  { t: 'Bodega Valle', f: 'Spot 30″', k: 'Color', g: 'var(--violet), var(--peach)' },
+  { t: 'Estudio Faro', f: 'Logo animado', k: 'Motion', g: 'var(--night), var(--lavender)' },
+];
+---
+<section class="section work" id="trabajos">
+  <p class="eyebrow reveal">Trabajos</p>
+  <h2 class="section__title reveal">En pantalla</h2>
+  <p class="section__lede reveal">Proyectos de ejemplo para mostrar formatos. Reemplazalos por tus videos reales (YouTube, Vimeo o archivos propios).</p>
+  <ul class="grid">
+    {work.map((w, i) => (
+      <li class="reveal" style={`transition-delay:${(i % 3) * 0.08}s`}>
+        <a href="#contacto" class="item">
+          <div class="thumb" style={`--g:${w.g}`}>
+            <span class="play pixel">▶</span>
+            <span class="badge pixel">{w.k}</span>
+          </div>
+          <div class="meta"><h3>{w.t}</h3><span>{w.f}</span></div>
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>
+<style>
+  .work { background: var(--night); }
+  .grid { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; margin-top: 3.5rem; }
+  .thumb {
+    position: relative; aspect-ratio: 16 / 10; overflow: hidden; border: 3px solid var(--indigo);
+    background: linear-gradient(135deg, var(--g));
+    border-radius: 14px / 18px;
+  }
+  .thumb::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(7,17,57,.18) 0 2px, transparent 2px 4px), radial-gradient(120% 90% at 50% 50%, transparent 55%, rgba(7,17,57,.6));
+  }
+  .play {
+    position: absolute; inset: 0; margin: auto; width: 58px; height: 58px; display: grid; place-items: center; z-index: 1;
+    background: rgba(7,17,57,.7); color: var(--cyan); border: 2px solid var(--cyan); font-size: .8rem; transition: transform .3s var(--ease), background .3s;
+  }
+  .item:hover .play { transform: scale(1.12); background: var(--cyan); color: var(--ink); }
+  .item:hover .thumb { border-color: var(--cyan); }
+  .badge { position: absolute; left: .7rem; top: .7rem; z-index: 1; font-size: .5rem; padding: .35rem .5rem; background: var(--ink); color: var(--peach); }
+  .meta { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding-top: .8rem; }
+  .meta h3 { font-size: 1rem; font-weight: 600; }
+  .meta span { font-size: .8rem; opacity: .65; }
+  @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+</style>

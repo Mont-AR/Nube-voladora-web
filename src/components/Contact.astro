@@ -1,0 +1,50 @@
+---
+import Logo from './Logo.astro';
+const email = 'hola@nubevoladora.com';
+---
+<section class="section contact" id="contacto">
+  <div class="contact__inner">
+    <div>
+      <p class="eyebrow reveal">Contacto</p>
+      <h2 class="section__title reveal">¿Tenés material?<br /><span>Lo hacemos volar.</span></h2>
+      <p class="section__lede reveal">Contanos qué necesitás y te respondemos con una propuesta en 48 h.</p>
+    </div>
+    <form class="form reveal" action={`mailto:${email}`} method="post" enctype="text/plain">
+      <label>Nombre<input name="nombre" required autocomplete="name" /></label>
+      <label>Email<input name="email" type="email" required autocomplete="email" /></label>
+      <label>Tipo de proyecto
+        <select name="tipo">
+          <option>Edición</option><option>Motion</option><option>Contenido para redes</option><option>Color</option><option>No sé todavía</option>
+        </select>
+      </label>
+      <label>Mensaje<textarea name="mensaje" rows="4" placeholder="Tengo 3 horas de entrevistas y quiero 10 reels…"></textarea></label>
+      <button class="btn btn--cyan rgb-border" type="submit">Enviar ▶</button>
+    </form>
+  </div>
+  <footer class="footer">
+    <a href="#inicio" class="brand"><Logo size={22} /><span class="pixel">NUBE VOLADORA</span></a>
+    <nav><a href="#">Instagram</a><a href="#">YouTube</a><a href="#">TikTok</a><a href={`mailto:${email}`}>{email}</a></nav>
+    <span>© {new Date().getFullYear()}</span>
+  </footer>
+</section>
+<style>
+  .contact { background: linear-gradient(180deg, var(--night), var(--violet) 70%, var(--magenta) 130%); padding-bottom: 2rem; }
+  .contact__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
+  .section__title span { color: var(--peach); }
+  .form { display: grid; gap: 1rem; padding: 2rem; background: rgba(7,17,57,.7); border: 2px solid rgba(180,140,255,.3); }
+  label { display: grid; gap: .4rem; font-size: .8rem; color: var(--lavender); }
+  input, select, textarea {
+    background: var(--ink); border: 2px solid var(--indigo); padding: .75rem .8rem; color: var(--cream); font-size: .95rem;
+  }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--cyan); }
+  .form .btn { justify-self: start; }
+  .footer {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;
+    margin-top: 7rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,246,217,.15); font-size: .8rem;
+  }
+  .brand { display: flex; align-items: center; gap: .6rem; }
+  .brand span { font-size: .55rem; }
+  .footer nav { display: flex; flex-wrap: wrap; gap: 1.2rem; }
+  .footer nav a:hover { color: var(--cyan); }
+  @media (max-width: 860px) { .contact__inner { grid-template-columns: 1fr; } .form { padding: 1.3rem; } }
+</style>

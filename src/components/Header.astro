@@ -1,39 +1,29 @@
+---
+import Logo from './Logo.astro';
+---
 <header class="header">
-  <a href="/" class="logo" aria-label="Lumen Studio, inicio">
-    <span class="logo__a">lumen</span><span class="logo__b">studio</span><sup>®</sup>
+  <a href="#inicio" class="brand" aria-label="Nube Voladora, inicio">
+    <Logo />
+    <span class="pixel">NUBE<br />VOLADORA</span>
   </a>
-  <nav class="nav">
-    <a href="#index">Index</a>
-    <a href="#projects">Projects</a>
-    <a href="#contact">Contact</a>
-    <button class="icon-btn menu-toggle" aria-label="Abrir menú" aria-expanded="false">
-      <span class="dots"><i></i><i></i></span>
-    </button>
+  <nav class="nav" aria-label="Principal">
+    <a href="#servicios">Servicios</a>
+    <a href="#proceso">Proceso</a>
+    <a href="#trabajos">Trabajos</a>
+    <a href="#contacto" class="btn rgb-border">Cotizar</a>
   </nav>
 </header>
 <style>
   .header {
-    position: fixed; inset: 0 0 auto; z-index: 100;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 1.6rem 2.2rem; mix-blend-mode: normal;
+    position: fixed; inset: 0 0 auto; z-index: 50; display: flex; justify-content: space-between; align-items: center;
+    padding: 1.2rem clamp(16px, 4vw, 2.5rem);
+    background: linear-gradient(180deg, rgba(7,17,57,.75), rgba(7,17,57,0));
   }
-  .logo { display: flex; align-items: baseline; font-size: 1.85rem; letter-spacing: -.03em; line-height: 1; }
-  .logo__a { font-family: var(--sans); font-weight: 400; }
-  .logo__b { font-family: var(--serif); margin-left: .12em; }
-  .logo sup { font-size: .5rem; margin-left: 2px; }
-  .nav { display: flex; align-items: center; gap: 1.4rem; font-size: 1.05rem; }
-  .nav a { position: relative; }
-  .nav a::after {
-    content: ''; position: absolute; left: 0; bottom: -2px; width: 100%; height: 1px; background: currentColor;
-    transform: scaleX(0); transform-origin: right; transition: transform .5s var(--ease);
-  }
-  .nav a:hover::after { transform: scaleX(1); transform-origin: left; }
-  .dots { display: flex; gap: 4px; transition: transform .5s var(--ease); }
-  .dots i { width: 4px; height: 4px; border-radius: 50%; background: var(--ink); }
-  :global(body.menu-open) .dots { transform: rotate(90deg); }
-  @media (max-width: 700px) {
-    .header { padding: 1.1rem 16px; }
-    .logo { font-size: 1.4rem; }
-    .nav a { display: none; }
-  }
+  .brand { display: flex; align-items: center; gap: .7rem; }
+  .brand span { font-size: .62rem; line-height: 1.5; }
+  .nav { display: flex; align-items: center; gap: 1.6rem; font-size: .9rem; }
+  .nav a:not(.btn) { opacity: .85; transition: opacity .2s, color .2s; }
+  .nav a:not(.btn):hover { opacity: 1; color: var(--cyan); }
+  .nav .btn { padding: .7rem 1rem; background: rgba(7,17,57,.6); }
+  @media (max-width: 760px) { .nav a:not(.btn) { display: none; } }
 </style>

@@ -1,0 +1,43 @@
+---
+const steps = [
+  { n: '01', t: 'Despegue', d: 'Nos contás la idea, el público y dónde va a vivir el video.' },
+  { n: '02', t: 'Guion y ruta', d: 'Armamos estructura, referencias y un plan de entregas.' },
+  { n: '03', t: 'Edicion', d: 'Montaje, motion, color y sonido. Revisiones por etapa.' },
+  { n: '04', t: 'Aterrizaje', d: 'Entregamos versiones para cada red, listas para publicar.' },
+];
+---
+<section class="section process" id="proceso">
+  <p class="eyebrow reveal">Proceso</p>
+  <h2 class="section__title reveal">La ruta del video</h2>
+  <ol class="route">
+    {steps.map((s, i) => (
+      <li class="reveal" style={`transition-delay:${i * 0.1}s`}>
+        <span class="node pixel">{s.n}</span>
+        <h3 class="pixel">{s.t}</h3>
+        <p>{s.d}</p>
+      </li>
+    ))}
+  </ol>
+</section>
+<style>
+  .process { background: radial-gradient(120% 80% at 50% 120%, var(--violet), var(--night) 60%); overflow: hidden; }
+  .route { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; margin-top: 4rem; position: relative; }
+  .route::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 23px; height: 4px;
+    background: repeating-linear-gradient(90deg, var(--cyan) 0 14px, transparent 14px 26px);
+    filter: drop-shadow(0 0 8px var(--cyan)); animation: route 1.2s linear infinite;
+  }
+  @keyframes route { to { background-position: 26px 0; } }
+  .route li { position: relative; }
+  .node {
+    display: grid; place-items: center; width: 50px; height: 50px; margin-bottom: 1.4rem; font-size: .7rem;
+    background: var(--ink); border: 3px solid var(--cyan); color: var(--cyan); box-shadow: 0 0 22px -4px var(--cyan); position: relative;
+  }
+  .route h3 { font-size: .85rem; margin-bottom: .7rem; color: var(--peach); }
+  .route p { font-size: .9rem; opacity: .8; max-width: 26ch; }
+  @media (max-width: 860px) {
+    .route { grid-template-columns: 1fr; gap: 2.4rem; padding-left: 70px; }
+    .route::before { left: 23px; right: auto; top: 0; bottom: 0; width: 4px; height: auto; background: repeating-linear-gradient(180deg, var(--cyan) 0 14px, transparent 14px 26px); }
+    .node { position: absolute; left: -70px; top: -6px; }
+  }
+</style>

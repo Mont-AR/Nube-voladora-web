@@ -1,0 +1,44 @@
+---
+const services = [
+  { ch: 0, code: 'CH 01', name: 'Edicion', text: 'Del material crudo a una historia con ritmo: armado, cortes, sonido y subtítulos. Videos largos, entrevistas, eventos y YouTube.', tags: ['Montaje', 'Audio', 'Subtítulos'] },
+  { ch: 1, code: 'CH 02', name: 'Motion', text: 'Gráficos animados, títulos, logos en movimiento y explicadores que hacen que tu marca no pase desapercibida.', tags: ['2D / 3D', 'Títulos', 'Explainers'] },
+  { ch: 2, code: 'CH 03', name: 'Redes', text: 'Reels, shorts y TikToks pensados para retener. Adaptamos cada pieza a 9:16, 1:1 y 16:9, con ganchos y subtítulos dinámicos.', tags: ['Reels', 'Shorts', 'Calendario'] },
+  { ch: 3, code: 'CH 04', name: 'Color', text: 'Corrección y etalonaje para que todo tu material tenga la misma piel, la misma luz y una identidad visual propia.', tags: ['Corrección', 'Look', 'LUTs'] },
+];
+---
+<section class="section services" id="servicios">
+  <p class="eyebrow reveal">Servicios</p>
+  <h2 class="section__title reveal">Cuatro canales,<br />una misma nube</h2>
+  <p class="section__lede reveal">Cada servicio es un canal de nuestra tele. Elegí uno y lo sintonizamos arriba.</p>
+  <ul class="grid">
+    {services.map((s, i) => (
+      <li class="reveal" style={`transition-delay:${i * 0.08}s`}>
+        <button data-channel={s.ch} class:list={['card', { 'is-active': s.ch === 0 }]}>
+          <span class="card__code pixel">{s.code}</span>
+          <h3 class="pixel">{s.name}</h3>
+          <p>{s.text}</p>
+          <span class="card__tags">{s.tags.map((t) => <span>{t}</span>)}</span>
+          <span class="card__cta">Ver en la tele ↑</span>
+        </button>
+      </li>
+    ))}
+  </ul>
+</section>
+<style>
+  .services { background: linear-gradient(180deg, var(--ink), var(--night)); }
+  .grid { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 3.5rem; }
+  .card {
+    width: 100%; height: 100%; text-align: left; display: flex; flex-direction: column; gap: 1rem; padding: 1.6rem 1.4rem;
+    background: rgba(18,13,80,.55); border: 2px solid rgba(180,140,255,.25); transition: border-color .3s, transform .3s var(--ease), background .3s;
+  }
+  .card:hover { transform: translateY(-4px); border-color: var(--lavender); }
+  .card.is-active { border-color: var(--cyan); background: rgba(18,13,80,.85); box-shadow: 0 0 40px -12px var(--cyan); }
+  .card__code { font-size: .6rem; color: var(--magenta); }
+  .card h3 { font-size: 1.05rem; }
+  .card p { font-size: .9rem; opacity: .8; flex: 1; }
+  .card__tags { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .card__tags span { font-size: .7rem; padding: .2rem .5rem; border: 1px solid rgba(97,247,231,.4); color: var(--cyan); }
+  .card__cta { font-size: .75rem; color: var(--peach); }
+  @media (max-width: 1000px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+</style>
