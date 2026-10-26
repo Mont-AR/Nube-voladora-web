@@ -1,0 +1,33 @@
+---
+import Logo from './Logo.astro';
+import { SITE, WA_LINK } from '../data/site';
+---
+<footer class="footer">
+  <a href="#inicio" class="brand" aria-label="Nube Voladora, volver al inicio"><Logo size={22} /><span class="pixel">NUBE VOLADORA</span></a>
+  <nav aria-label="Redes y contacto">
+    <ul>
+      <li><a href={SITE.social.instagram}>Instagram</a></li>
+      <li><a href={SITE.social.youtube}>YouTube</a></li>
+      <li><a href={SITE.social.tiktok}>TikTok</a></li>
+      <li><a href={WA_LINK} target="_blank" rel="noopener">WhatsApp</a></li>
+      <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
+    </ul>
+  </nav>
+  <p><small>© {new Date().getFullYear()} {SITE.name} · Desarrollado por <a class="credit" href="https://montivero.ar" target="_blank" rel="noopener">Mont.ar</a></small></p>
+</footer>
+<style>
+  /* continúa el degradé magenta del contacto */
+  .footer {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;
+    padding: 1.5rem clamp(16px, 5vw, 4rem) 2rem; font-size: .8rem;
+    background: color-mix(in srgb, var(--magenta) 55%, rgb(67, 16, 95));
+    box-shadow: inset 0 1px 0 rgba(255, 246, 217, .2);
+  }
+  .brand { display: flex; align-items: center; gap: .6rem; }
+  .brand span { font-size: .55rem; }
+  ul { list-style: none; display: flex; flex-wrap: wrap; gap: 1.2rem; }
+  ul a:hover { color: var(--cyan); }
+  small { font-size: inherit; }
+  .credit { color: var(--cyan); }
+  .credit:hover { color: var(--cream); text-decoration: underline; }
+</style>

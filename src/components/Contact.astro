@@ -1,6 +1,5 @@
 ---
-import Logo from './Logo.astro';
-const email = 'contacto@nubevoladora.com';
+import { SITE, WA_LINK } from '../data/site';
 ---
 <section class="section contact" id="contacto">
   <div class="contact__inner">
@@ -8,8 +7,12 @@ const email = 'contacto@nubevoladora.com';
       <p class="eyebrow reveal">Contacto</p>
       <h2 class="section__title reveal">¿Tenés material?<br /><span>Lo hacemos volar.</span></h2>
       <p class="section__lede reveal">Contanos qué necesitás y te respondemos con una propuesta en 48 h.</p>
+      <div class="direct reveal">
+        <a href={WA_LINK} class="btn btn--whatsapp" target="_blank" rel="noopener">WhatsApp ▶</a>
+        <span>o escribinos por el formulario</span>
+      </div>
     </div>
-    <form class="form reveal" action={`mailto:${email}`} method="post" enctype="text/plain">
+    <form class="form reveal" action={`mailto:${SITE.email}`} method="post" enctype="text/plain">
       <label>Nombre<input name="nombre" required autocomplete="name" /></label>
       <label>Email<input name="email" type="email" required autocomplete="email" /></label>
       <label>Tipo de proyecto
@@ -21,11 +24,6 @@ const email = 'contacto@nubevoladora.com';
       <button class="btn btn--cyan" type="submit">Enviar ▶</button>
     </form>
   </div>
-  <footer class="footer">
-    <a href="#inicio" class="brand"><Logo size={22} /><span class="pixel">NUBE VOLADORA</span></a>
-    <nav><a href="#">Instagram</a><a href="#">YouTube</a><a href="#">TikTok</a><a href={`mailto:${email}`}>{email}</a></nav>
-    <span>© {new Date().getFullYear()}</span>
-  </footer>
 </section>
 <script>
   // los CTA con data-tipo preseleccionan el tipo de proyecto
@@ -35,7 +33,7 @@ const email = 'contacto@nubevoladora.com';
   );
 </script>
 <style>
-  .contact { background: linear-gradient(180deg, transparent, rgba(67, 16, 95, .8) 70%, var(--magenta) 130%); padding-bottom: 2rem; }
+  .contact { background: linear-gradient(180deg, transparent, rgba(67, 16, 95, .8) 60%, color-mix(in srgb, var(--magenta) 55%, rgb(67, 16, 95))); }
   .contact__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
   .section__title span { color: var(--peach); }
   .form { display: grid; gap: 1rem; padding: 2rem; background: rgba(7,17,57,.7); border: 2px solid rgba(180,140,255,.3); }
@@ -45,13 +43,8 @@ const email = 'contacto@nubevoladora.com';
   }
   input:focus, select:focus, textarea:focus { outline: none; border-color: var(--cyan); }
   .form .btn { justify-self: start; }
-  .footer {
-    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;
-    margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,246,217,.15); font-size: .8rem;
-  }
-  .brand { display: flex; align-items: center; gap: .6rem; }
-  .brand span { font-size: .55rem; }
-  .footer nav { display: flex; flex-wrap: wrap; gap: 1.2rem; }
-  .footer nav a:hover { color: var(--cyan); }
+  .direct { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.4rem; margin-top: 2rem; }
+  .direct span { font-size: .8rem; opacity: .7; }
+  .btn--whatsapp { --bg: #25d366; --fg: var(--ink); --bc: #b9f5d0; --sh: var(--violet); }
   @media (max-width: 860px) { .contact__inner { grid-template-columns: 1fr; } .form { padding: 1.3rem; } }
 </style>
