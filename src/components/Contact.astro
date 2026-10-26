@@ -1,18 +1,18 @@
 ---
 import { SITE, WA_LINK } from '../data/site';
 ---
-<section class="section contact" id="contacto">
+<section class="section contact" id="contacto" aria-labelledby="contacto-title">
   <div class="contact__inner">
     <div>
       <p class="eyebrow reveal">Contacto</p>
-      <h2 class="section__title reveal">¿Tenés material?<br /><span>Lo hacemos volar.</span></h2>
+      <h2 class="section__title reveal" id="contacto-title">¿Tenés material?<br /><span>Lo hacemos volar.</span></h2>
       <p class="section__lede reveal">Contanos qué necesitás y te respondemos con una propuesta en 48 h.</p>
       <div class="direct reveal">
         <a href={WA_LINK} class="btn btn--whatsapp" target="_blank" rel="noopener">WhatsApp ▶</a>
         <span>o escribinos por el formulario</span>
       </div>
     </div>
-    <form class="form reveal" action={`mailto:${SITE.email}`} method="post" enctype="text/plain">
+    <form class="form reveal" action={`mailto:${SITE.email}`} aria-label="Formulario de contacto" method="post" enctype="text/plain">
       <label>Nombre<input name="nombre" required autocomplete="name" /></label>
       <label>Email<input name="email" type="email" required autocomplete="email" /></label>
       <label>Tipo de proyecto

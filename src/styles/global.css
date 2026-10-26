@@ -36,6 +36,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
 button { background: none; border: 0; cursor: pointer; }
 ::selection { background: var(--magenta); color: var(--cream); }
 
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.skip { position: fixed; left: 1rem; top: -4rem; z-index: 300; padding: .8rem 1rem; background: var(--cyan); color: var(--ink); font-family: var(--pixel); font-size: .6rem; }
+.skip:focus { top: 1rem; }
 .pixel { font-family: var(--pixel); letter-spacing: .02em; line-height: 1.35; }
 .eyebrow { font-family: var(--pixel); font-size: .62rem; letter-spacing: .12em; color: var(--cyan); text-transform: uppercase; }
 .section { padding: clamp(4rem, 10vh, 6rem) clamp(16px, 5vw, 4rem); position: relative; }

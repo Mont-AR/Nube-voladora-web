@@ -8,9 +8,9 @@ const steps = [
   { n: '05', t: 'Aterrizaje', d: 'Entregamos versiones para cada red, listas para publicar.' },
 ];
 ---
-<section class="section process" id="proceso">
+<section class="section process" id="proceso" aria-labelledby="proceso-title">
   <p class="eyebrow reveal">Proceso</p>
-  <h2 class="section__title reveal">La ruta del video</h2>
+  <h2 class="section__title reveal" id="proceso-title">La ruta del video</h2>
   <p class="section__lede reveal">Seguí a la nube: así viaja un proyecto desde la idea hasta tu feed.</p>
   <div class="route">
     <svg class="route__svg" aria-hidden="true"><path class="route__base" /><path class="route__line" /></svg>
@@ -18,7 +18,7 @@ const steps = [
     <ol>
       {steps.map((s) => (
         <li class="step">
-          <span class="node pixel">{s.n}</span>
+          <span class="node pixel" aria-hidden="true">{s.n}</span>
           <div class="step__card">
             <h3 class="pixel">{s.t}</h3>
             <p>{s.d}</p>

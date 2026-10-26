@@ -1,14 +1,15 @@
 ---
 import { CHANNELS } from '../scripts/nube-scene';
 ---
-<section class="hero" id="inicio">
-  <canvas class="webgl" aria-label="Escena 3D: una nube voladora lleva una tele retro sobre un valle al atardecer"></canvas>
+<section class="hero" id="inicio" aria-labelledby="hero-title">
+  <canvas class="webgl" role="img" aria-label="Escena 3D: una nube voladora lleva una tele retro sobre un valle al atardecer"></canvas>
 
   <div class="hero__copy">
     <p class="eyebrow reveal">Contenido · Edicion · Motion</p>
-    <h1 class="pixel">
+    <h1 class="pixel" id="hero-title">
       <span class="line"><span>Nube</span></span>
       <span class="line line--accent"><span>Voladora</span></span>
+      <span class="sr-only">: estudio de edición de video y creación de contenido</span>
     </h1>
     <p class="lede reveal">Le damos alas a tus videos. Creamos contenido original para tu marca o editamos tu material para que vuele en cada pantalla.</p>
     <div class="ctas reveal">
@@ -46,9 +47,11 @@ import { CHANNELS } from '../scripts/nube-scene';
   scene.onChannel((ch) => {
     num.textContent = String(ch + 1).padStart(2, '0');
     name.textContent = CHANNELS[ch].name;
-    document.querySelectorAll('[data-channel]').forEach((el) =>
-      el.classList.toggle('is-active', Number((el as HTMLElement).dataset.channel) === ch),
-    );
+    document.querySelectorAll('[data-channel]').forEach((el) => {
+      const on = Number((el as HTMLElement).dataset.channel) === ch;
+      el.classList.toggle('is-active', on);
+      el.setAttribute('aria-pressed', String(on));
+    });
   });
   hero.querySelectorAll<HTMLButtonElement>('.tuner__btn').forEach((b) =>
     b.addEventListener('click', () => (b.dataset.dir === '1' ? scene.next() : scene.prev())),

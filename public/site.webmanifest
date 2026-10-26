@@ -1,0 +1,8 @@
+{
+  "name": "Nube Voladora",
+  "short_name": "Nube Voladora",
+  "icons": [{ "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }],
+  "theme_color": "#071139",
+  "background_color": "#071139",
+  "display": "standalone"
+}

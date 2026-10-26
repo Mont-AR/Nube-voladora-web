@@ -15,22 +15,22 @@ const work: Item[] = [
   { t: 'Strike', f: 'Aftermovie 16:9', k: 'Edicion', src: mixkit(49102), wide: true },
 ];
 ---
-<section class="work" id="trabajos">
+<section class="work" id="trabajos" aria-labelledby="trabajos-title">
   <div class="work__pin">
     <header class="work__head">
       <div>
         <p class="eyebrow">Trabajos</p>
-        <h2 class="section__title">En pantalla</h2>
+        <h2 class="section__title" id="trabajos-title">En pantalla</h2>
       </div>
-      <p class="work__hint pixel"><span class="work__count">01</span> / {String(work.length).padStart(2, '0')} &nbsp;Scroll ▶</p>
+      <p class="work__hint pixel" aria-hidden="true"><span class="work__count">01</span> / {String(work.length).padStart(2, '0')} &nbsp;Scroll ▶</p>
     </header>
     <ul class="track">
       {work.map((w, i) => (
         <li class:list={['item', { 'item--wide': w.wide, 'item--low': w.wide && i % 4 === 3 }]}>
           <div class="screen">
-            <video src={w.src} muted loop playsinline preload="none"></video>
+            <video src={w.src} muted loop playsinline preload="none" aria-label={`${w.t}: ${w.f}`}></video>
             <button class="sound pixel" aria-label="Activar sonido">SND OFF</button>
-            <span class="badge pixel">{w.k}</span>
+            <span class="badge pixel" aria-hidden="true">{w.k}</span>
           </div>
           <div class="meta">
             <h3>{w.t}</h3>
@@ -38,7 +38,7 @@ const work: Item[] = [
           </div>
         </li>
       ))}
-      <li class="item item--end">
+      <li class="item item--end" aria-label="Contacto">
         <p class="pixel">¿El próximo<br />es el tuyo?</p>
         <a href="#contacto" class="btn btn--cyan">Cotizar ▶</a>
       </li>

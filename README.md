@@ -21,3 +21,5 @@ npm run build
 ```
 
 La escena vive en `src/scripts/nube-scene.ts`; los textos de cada sección en `src/components/`.
+
+Email, WhatsApp y redes se editan en `src/data/site.ts` (los usan Contacto, Footer y los metadatos). El dominio está en `astro.config.mjs` (`site`) y de ahí salen el canonical, Open Graph, `robots.txt` y `sitemap.xml`. Íconos e imagen para compartir en `public/` (`favicon.svg`, `favicon.ico`, `apple-touch-icon.png`, `icon-512.png`, `og.png`).
