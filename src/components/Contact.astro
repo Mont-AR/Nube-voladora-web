@@ -14,10 +14,10 @@ const email = 'hola@nubevoladora.com';
       <label>Email<input name="email" type="email" required autocomplete="email" /></label>
       <label>Tipo de proyecto
         <select name="tipo">
-          <option>Edición</option><option>Motion</option><option>Contenido para redes</option><option>Color</option><option>No sé todavía</option>
+          <option>Pack de Reels</option><option>Edición</option><option>Motion</option><option>Contenido para redes</option><option>Color</option><option>No sé todavía</option>
         </select>
       </label>
-      <label>Mensaje<textarea name="mensaje" rows="4" placeholder="Tengo 3 horas de entrevistas y quiero 10 reels…"></textarea></label>
+      <label>Mensaje<textarea name="mensaje" rows="4" placeholder="Quiero un pack de 8 reels por mes para mi marca…"></textarea></label>
       <button class="btn btn--cyan rgb-border" type="submit">Enviar ▶</button>
     </form>
   </div>
@@ -27,6 +27,13 @@ const email = 'hola@nubevoladora.com';
     <span>© {new Date().getFullYear()}</span>
   </footer>
 </section>
+<script>
+  // los CTA con data-tipo preseleccionan el tipo de proyecto
+  const tipo = document.querySelector<HTMLSelectElement>('.form select[name="tipo"]')!;
+  document.querySelectorAll<HTMLElement>('[data-tipo]').forEach((el) =>
+    el.addEventListener('click', () => (tipo.value = el.dataset.tipo!)),
+  );
+</script>
 <style>
   .contact { background: linear-gradient(180deg, var(--night), var(--violet) 70%, var(--magenta) 130%); padding-bottom: 2rem; }
   .contact__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }

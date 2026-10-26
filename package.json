@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@types/three": "^0.186.0",
-    "astro": "^5.18.2",
+    "astro": "^7.4.2",
     "three": "^0.186.1"
   }
 }

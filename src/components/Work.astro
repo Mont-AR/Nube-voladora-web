@@ -1,53 +1,153 @@
 ---
-const work = [
-  { t: 'Café de altura', f: 'Reel 9:16', k: 'Redes', g: 'var(--magenta), var(--coral)' },
-  { t: 'Festival Norte', f: 'Aftermovie 16:9', k: 'Edicion', g: 'var(--violet), var(--magenta)' },
-  { t: 'App Brújula', f: 'Explainer', k: 'Motion', g: 'var(--indigo), var(--cyan)' },
-  { t: 'Podcast Cumbre', f: 'Clips + shorts', k: 'Redes', g: 'var(--coral), var(--gold)' },
-  { t: 'Bodega Valle', f: 'Spot 30″', k: 'Color', g: 'var(--violet), var(--peach)' },
-  { t: 'Estudio Faro', f: 'Logo animado', k: 'Motion', g: 'var(--night), var(--lavender)' },
+// ig: reel real de un cliente (id del link de Instagram)
+// mp4: video de muestra de Mixkit (licencia libre), reemplazar por material propio
+type Item = { t: string; f: string; k: string; ig?: string; mp4?: string; wide?: boolean };
+const mixkit = (id: number) => `https://assets.mixkit.co/videos/${id}/${id}-720.mp4`;
+const work: Item[] = [
+  { t: 'Cliente real', f: 'Pack de Reels', k: 'Contenido', ig: 'Dd9Te1-RhSa' },
+  { t: 'Cliente real', f: 'Pack de Reels', k: 'Contenido', ig: 'DeKK5I-RjuZ' },
+  { t: 'Moda Pop', f: 'Spot 16:9', k: 'Color', mp4: mixkit(42298), wide: true },
+  { t: 'Vlog de ruta', f: 'Reel 9:16', k: 'Redes', mp4: mixkit(32809) },
+  { t: 'Café de altura', f: 'Producto 16:9', k: 'Edicion', mp4: mixkit(26345), wide: true },
+  { t: 'Bosque adentro', f: 'Short 9:16', k: 'Redes', mp4: mixkit(39767) },
+  { t: 'Voces', f: 'Entrevista 16:9', k: 'Edicion', mp4: mixkit(4883), wide: true },
+  { t: 'Marea', f: 'Loop 9:16', k: 'Motion', mp4: mixkit(1164) },
+  { t: 'Strike', f: 'Aftermovie 16:9', k: 'Edicion', mp4: mixkit(49102), wide: true },
 ];
 ---
-<section class="section work" id="trabajos">
-  <p class="eyebrow reveal">Trabajos</p>
-  <h2 class="section__title reveal">En pantalla</h2>
-  <p class="section__lede reveal">Proyectos de ejemplo para mostrar formatos. Reemplazalos por tus videos reales (YouTube, Vimeo o archivos propios).</p>
-  <ul class="grid">
-    {work.map((w, i) => (
-      <li class="reveal" style={`transition-delay:${(i % 3) * 0.08}s`}>
-        <a href="#contacto" class="item">
-          <div class="thumb" style={`--g:${w.g}`}>
-            <span class="play pixel">▶</span>
-            <span class="badge pixel">{w.k}</span>
+<section class="work" id="trabajos">
+  <div class="work__pin">
+    <header class="work__head">
+      <div>
+        <p class="eyebrow">Trabajos</p>
+        <h2 class="section__title">En pantalla</h2>
+      </div>
+      <p class="work__hint pixel"><span class="work__count">01</span> / {String(work.length).padStart(2, '0')} &nbsp;Scroll ▶</p>
+    </header>
+    <ul class="track">
+      {work.map((w, i) => (
+        <li class:list={['item', { 'item--wide': w.wide, 'item--low': w.wide && i % 4 === 0 }]}>
+          <div class="screen">
+            {w.ig ? (
+              <iframe src={`https://www.instagram.com/reel/${w.ig}/embed/`} title={`Reel: ${w.f}`} loading="lazy" allowfullscreen></iframe>
+            ) : (
+              <>
+                <video src={w.mp4} muted loop playsinline preload="none"></video>
+                <button class="sound pixel" aria-label="Activar sonido">SND OFF</button>
+              </>
+            )}
+            {!w.ig && <span class="badge pixel">{w.k}</span>}
           </div>
-          <div class="meta"><h3>{w.t}</h3><span>{w.f}</span></div>
-        </a>
+          <div class="meta">
+            <h3>{w.t}</h3>
+            {w.ig ? <a href={`https://www.instagram.com/reel/${w.ig}/`} target="_blank" rel="noopener">Instagram ↗</a> : <span>{w.f}</span>}
+          </div>
+        </li>
+      ))}
+      <li class="item item--end">
+        <p class="pixel">¿El próximo<br />es el tuyo?</p>
+        <a href="#contacto" class="btn btn--cyan">Cotizar ▶</a>
       </li>
-    ))}
-  </ul>
+    </ul>
+    <div class="progress" aria-hidden="true"><span></span></div>
+  </div>
 </section>
+
+<script>
+  // scroll vertical → desplazamiento horizontal mientras la sección queda fija
+  const section = document.querySelector<HTMLElement>('.work')!;
+  const track = section.querySelector<HTMLElement>('.track')!;
+  const bar = section.querySelector<HTMLElement>('.progress span')!;
+  const count = section.querySelector('.work__count')!;
+  const items = [...track.querySelectorAll<HTMLElement>('.item')];
+  let dist = 0;
+
+  const layout = () => {
+    dist = Math.max(0, track.scrollWidth - innerWidth);
+    section.style.height = `${dist + innerHeight}px`;
+    update();
+  };
+  const update = () => {
+    const p = Math.min(Math.max(-section.getBoundingClientRect().top / (dist || 1), 0), 1);
+    track.style.transform = `translate3d(${-p * dist}px,0,0)`;
+    bar.style.transform = `scaleX(${p})`;
+    const i = Math.min(items.length - 2, Math.round(p * (items.length - 2)));
+    count.textContent = String(i + 1).padStart(2, '0');
+  };
+  addEventListener('scroll', update, { passive: true });
+  addEventListener('resize', layout);
+  layout();
+
+  // los videos solo corren cuando están a la vista
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      const v = e.target as HTMLVideoElement;
+      if (e.isIntersecting) v.play().catch(() => {});
+      else v.pause();
+    }
+  }, { threshold: 0.25 });
+  track.querySelectorAll('video').forEach((v) => io.observe(v));
+
+  track.querySelectorAll<HTMLButtonElement>('.sound').forEach((b) =>
+    b.addEventListener('click', () => {
+      const v = b.parentElement!.querySelector('video')!;
+      track.querySelectorAll('video').forEach((o) => { if (o !== v) o.muted = true; });
+      track.querySelectorAll('.sound').forEach((o) => { if (o !== b) o.textContent = 'SND OFF'; });
+      v.muted = !v.muted;
+      b.textContent = v.muted ? 'SND OFF' : 'SND ON';
+      b.setAttribute('aria-label', v.muted ? 'Activar sonido' : 'Silenciar');
+    }),
+  );
+</script>
+
 <style>
-  .work { background: var(--night); }
-  .grid { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; margin-top: 3.5rem; }
-  .thumb {
-    position: relative; aspect-ratio: 16 / 10; overflow: hidden; border: 3px solid var(--indigo);
-    background: linear-gradient(135deg, var(--g));
-    border-radius: 14px / 18px;
+  .work { position: relative; background: var(--night); }
+  .work__pin { position: sticky; top: 0; height: 100svh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 2rem; padding-top: 4.5rem; }
+  .work__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; padding: 0 clamp(16px, 5vw, 4rem); }
+  .work__head .section__title { margin-bottom: 0; }
+  .work__hint { font-size: .55rem; color: var(--lavender); }
+  .work__count { color: var(--cyan); }
+
+  .track {
+    --h: min(54svh, 540px);
+    list-style: none; display: flex; align-items: flex-start; gap: clamp(1rem, 3vw, 2.4rem);
+    width: max-content; padding: 0 clamp(16px, 5vw, 4rem); will-change: transform;
   }
-  .thumb::after {
+  .item { flex: none; width: calc(var(--h) * 9 / 16); }
+  .item--wide { width: calc(var(--h) * .62 * 16 / 9); }
+  .item--wide.item--low { margin-top: calc(var(--h) * .38 - 2.4rem); }
+  .screen {
+    position: relative; height: var(--h); overflow: hidden; background: linear-gradient(135deg, var(--violet), var(--indigo));
+    border: 3px solid var(--indigo); border-radius: 18px; transition: border-color .3s;
+  }
+  .item--wide .screen { height: calc(var(--h) * .62); border-radius: 14px / 18px; }
+  .item:hover .screen { border-color: var(--cyan); }
+  .screen video, .screen iframe { width: 100%; height: 100%; display: block; border: 0; }
+  .screen video { object-fit: cover; }
+  .screen iframe { background: #fff; }
+  .screen:has(video)::after {
     content: ''; position: absolute; inset: 0; pointer-events: none;
-    background: repeating-linear-gradient(0deg, rgba(7,17,57,.18) 0 2px, transparent 2px 4px), radial-gradient(120% 90% at 50% 50%, transparent 55%, rgba(7,17,57,.6));
+    background: repeating-linear-gradient(0deg, rgba(7,17,57,.16) 0 2px, transparent 2px 4px), radial-gradient(120% 90% at 50% 50%, transparent 60%, rgba(7,17,57,.55));
   }
-  .play {
-    position: absolute; inset: 0; margin: auto; width: 58px; height: 58px; display: grid; place-items: center; z-index: 1;
-    background: rgba(7,17,57,.7); color: var(--cyan); border: 2px solid var(--cyan); font-size: .8rem; transition: transform .3s var(--ease), background .3s;
+  .badge { position: absolute; left: .7rem; top: .7rem; z-index: 1; font-size: .5rem; padding: .35rem .5rem; background: var(--ink); color: var(--peach); pointer-events: none; }
+  .sound {
+    position: absolute; right: .7rem; bottom: .7rem; z-index: 2; font-size: .5rem; padding: .45rem .55rem;
+    background: rgba(7,17,57,.75); color: var(--cyan); border: 2px solid var(--cyan); transition: background .2s, color .2s;
   }
-  .item:hover .play { transform: scale(1.12); background: var(--cyan); color: var(--ink); }
-  .item:hover .thumb { border-color: var(--cyan); }
-  .badge { position: absolute; left: .7rem; top: .7rem; z-index: 1; font-size: .5rem; padding: .35rem .5rem; background: var(--ink); color: var(--peach); }
+  .sound:hover { background: var(--cyan); color: var(--ink); }
   .meta { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding-top: .8rem; }
-  .meta h3 { font-size: 1rem; font-weight: 600; }
-  .meta span { font-size: .8rem; opacity: .65; }
-  @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  .meta h3 { font-size: .95rem; font-weight: 600; }
+  .meta span, .meta a { font-size: .78rem; opacity: .7; }
+  .meta a { color: var(--cyan); opacity: 1; }
+
+  .item--end { align-self: center; width: auto; padding-right: 10vw; display: grid; gap: 1.4rem; justify-items: start; }
+  .item--end p { font-size: clamp(1rem, 2.2vw, 1.5rem); line-height: 1.4; }
+
+  .progress { margin: 0 clamp(16px, 5vw, 4rem); height: 4px; background: rgba(180,140,255,.2); }
+  .progress span { display: block; height: 100%; background: var(--cyan); box-shadow: 0 0 12px var(--cyan); transform-origin: left; transform: scaleX(0); }
+
+  @media (max-width: 760px) {
+    .track { --h: min(52svh, 460px); }
+    .work__pin { gap: 1.4rem; }
+  }
 </style>

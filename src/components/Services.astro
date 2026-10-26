@@ -5,11 +5,40 @@ const services = [
   { ch: 2, code: 'CH 03', name: 'Redes', text: 'Reels, shorts y TikToks pensados para retener. Adaptamos cada pieza a 9:16, 1:1 y 16:9, con ganchos y subtítulos dinámicos.', tags: ['Reels', 'Shorts', 'Calendario'] },
   { ch: 3, code: 'CH 04', name: 'Color', text: 'Corrección y etalonaje para que todo tu material tenga la misma piel, la misma luz y una identidad visual propia.', tags: ['Corrección', 'Look', 'LUTs'] },
 ];
+const pack = [
+  { n: '01', t: 'Guion', d: 'Ideas, ganchos y textos para tu marca.' },
+  { n: '02', t: 'Filmación', d: 'Vamos a tu local, producto o equipo.' },
+  { n: '03', t: 'Audio', d: 'Voz, locución, música y sonido.' },
+  { n: '04', t: 'Edición', d: 'Ritmo, subtítulos y listo para publicar.' },
+];
 ---
 <section class="section services" id="servicios">
   <p class="eyebrow reveal">Servicios</p>
-  <h2 class="section__title reveal">Cuatro canales,<br />una misma nube</h2>
-  <p class="section__lede reveal">Cada servicio es un canal de nuestra tele. Elegí uno y cambiá lo que se ve en la tele.</p>
+  <h2 class="section__title reveal">Del guion<br />a la pantalla</h2>
+  <p class="section__lede reveal">Creamos contenido original desde cero o trabajamos sobre el material que ya tenés.</p>
+
+  <article class="pack reveal">
+    <div class="pack__screen">
+      <video src="https://assets.mixkit.co/videos/34487/34487-720.mp4" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+      <span class="pack__rec pixel">● REC</span>
+    </div>
+    <div class="pack__body">
+      <span class="pack__code pixel">Nuevo · Creación de contenido</span>
+      <h3 class="pixel">Pack de Reels<br /><span>de punta a punta</span></h3>
+      <p>No hace falta que tengas material: lo creamos con vos. Reels originales para marcas, desde la idea hasta la publicación.</p>
+      <ol class="pack__steps">
+        {pack.map((s) => (
+          <li><span class="pixel">{s.n}</span><div><b class="pixel">{s.t}</b><small>{s.d}</small></div></li>
+        ))}
+      </ol>
+      <div class="pack__ctas">
+        <a href="#contacto" class="btn btn--cyan" data-tipo="Pack de Reels">Quiero mi pack ▶</a>
+        <a href="#trabajos" class="btn btn--ghost">Ver reels</a>
+      </div>
+    </div>
+  </article>
+
+  <p class="sub pixel reveal">¿Ya tenés material? Sintonizá un canal</p>
   <ul class="grid">
     {services.map((s, i) => (
       <li class="reveal" style={`transition-delay:${i * 0.08}s`}>
@@ -26,7 +55,37 @@ const services = [
 </section>
 <style>
   .services { background: linear-gradient(180deg, var(--ink), var(--night)); }
-  .grid { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 3.5rem; }
+
+  .pack {
+    display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center;
+    margin-top: 3.5rem; padding: clamp(1.2rem, 3vw, 2.2rem);
+    background: linear-gradient(120deg, rgba(67,16,95,.75), rgba(18,13,80,.75));
+    border: 2px solid var(--magenta); box-shadow: 0 0 60px -20px var(--magenta);
+  }
+  .pack__screen { position: relative; aspect-ratio: 9 / 16; overflow: hidden; border: 3px solid var(--ink); border-radius: 22px; background: var(--ink); }
+  .pack__screen video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pack__screen::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(7,17,57,.16) 0 2px, transparent 2px 4px);
+  }
+  .pack__rec { position: absolute; top: .9rem; left: .9rem; z-index: 1; font-size: .5rem; color: var(--coral); animation: rec 1.2s steps(2) infinite; }
+  @keyframes rec { 50% { opacity: 0; } }
+  .pack__code { font-size: .55rem; color: var(--magenta); }
+  .pack h3 { font-size: clamp(1.1rem, 2.4vw, 1.7rem); line-height: 1.35; margin: 1rem 0; }
+  .pack h3 span { color: var(--peach); }
+  .pack__body > p { max-width: 52ch; opacity: .85; }
+  .pack__steps { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem 1.4rem; margin: 1.8rem 0; }
+  .pack__steps li { display: flex; gap: .8rem; align-items: flex-start; }
+  .pack__steps li > span {
+    flex: none; display: grid; place-items: center; width: 34px; height: 34px; font-size: .5rem;
+    background: var(--ink); border: 2px solid var(--cyan); color: var(--cyan);
+  }
+  .pack__steps b { display: block; font-size: .62rem; font-weight: normal; color: var(--cream); margin-bottom: .3rem; }
+  .pack__steps small { font-size: .8rem; opacity: .75; }
+  .pack__ctas { display: flex; flex-wrap: wrap; gap: .8rem; }
+
+  .sub { font-size: .62rem; color: var(--lavender); margin-top: 4.5rem; }
+  .grid { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.4rem; }
   .card {
     width: 100%; height: 100%; text-align: left; display: flex; flex-direction: column; gap: 1rem; padding: 1.6rem 1.4rem;
     background: rgba(18,13,80,.55); border: 2px solid rgba(180,140,255,.25); transition: border-color .3s, transform .3s var(--ease), background .3s;
@@ -40,5 +99,9 @@ const services = [
   .card__tags span { font-size: .7rem; padding: .2rem .5rem; border: 1px solid rgba(97,247,231,.4); color: var(--cyan); }
   .card__cta { font-size: .75rem; color: var(--peach); }
   @media (max-width: 1000px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  @media (max-width: 760px) {
+    .pack { grid-template-columns: 1fr; }
+    .pack__screen { max-width: 240px; }
+  }
+  @media (max-width: 560px) { .grid, .pack__steps { grid-template-columns: 1fr; } }
 </style>
