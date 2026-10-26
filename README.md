@@ -9,7 +9,7 @@ El hero es una escena 3D interactiva: una nube voladora lleva una tele CRT sobre
 - **Puntero:** mira pixel con estela de píxeles de la paleta y estallido al hacer click (solo en mouse/trackpad).
 - **Scroll:** acelera el vuelo y eleva la cámara.
 - **Servicios:** Pack de Reels destacado (guion, filmación, audio, edición) + los 4 canales.
-- **Trabajos:** galería que se desplaza en horizontal con el scroll; reels reales de Instagram y videos de muestra de Mixkit (reemplazar en `Work.astro`).
+- **Trabajos:** galería que se desplaza en horizontal con el scroll; por ahora videos de muestra de Mixkit; reemplazarlos en `Work.astro` por archivos de `public/videos/` o links directos a `.mp4`.
 - **Proceso:** un camino neón se dibuja con el scroll y la nube lo recorre encendiendo cada parada.
 - Todo se genera por código (sin modelos ni imágenes externas).
 

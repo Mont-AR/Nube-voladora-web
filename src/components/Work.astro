@@ -1,18 +1,18 @@
 ---
-// ig: reel real de un cliente (id del link de Instagram)
-// mp4: video de muestra de Mixkit (licencia libre), reemplazar por material propio
-type Item = { t: string; f: string; k: string; ig?: string; mp4?: string; wide?: boolean };
+// src: archivo en public/videos (ej. '/videos/cliente.mp4') o link directo al .mp4 donde esté subido
+// wide: true para horizontales (16:9); sin wide se muestra vertical (9:16)
+// por ahora son videos de muestra de Mixkit (licencia libre)
+type Item = { t: string; f: string; k: string; src: string; wide?: boolean };
 const mixkit = (id: number) => `https://assets.mixkit.co/videos/${id}/${id}-720.mp4`;
 const work: Item[] = [
-  { t: 'Cliente real', f: 'Pack de Reels', k: 'Contenido', ig: 'Dd9Te1-RhSa' },
-  { t: 'Cliente real', f: 'Pack de Reels', k: 'Contenido', ig: 'DeKK5I-RjuZ' },
-  { t: 'Moda Pop', f: 'Spot 16:9', k: 'Color', mp4: mixkit(42298), wide: true },
-  { t: 'Vlog de ruta', f: 'Reel 9:16', k: 'Redes', mp4: mixkit(32809) },
-  { t: 'Café de altura', f: 'Producto 16:9', k: 'Edicion', mp4: mixkit(26345), wide: true },
-  { t: 'Bosque adentro', f: 'Short 9:16', k: 'Redes', mp4: mixkit(39767) },
-  { t: 'Voces', f: 'Entrevista 16:9', k: 'Edicion', mp4: mixkit(4883), wide: true },
-  { t: 'Marea', f: 'Loop 9:16', k: 'Motion', mp4: mixkit(1164) },
-  { t: 'Strike', f: 'Aftermovie 16:9', k: 'Edicion', mp4: mixkit(49102), wide: true },
+  { t: 'Marca local', f: 'Pack de Reels', k: 'Contenido', src: mixkit(34487) },
+  { t: 'Moda Pop', f: 'Spot 16:9', k: 'Color', src: mixkit(42298), wide: true },
+  { t: 'Vlog de ruta', f: 'Reel 9:16', k: 'Redes', src: mixkit(32809) },
+  { t: 'Café de altura', f: 'Producto 16:9', k: 'Edicion', src: mixkit(26345), wide: true },
+  { t: 'Bosque adentro', f: 'Short 9:16', k: 'Redes', src: mixkit(39767) },
+  { t: 'Voces', f: 'Entrevista 16:9', k: 'Edicion', src: mixkit(4883), wide: true },
+  { t: 'Marea', f: 'Loop 9:16', k: 'Motion', src: mixkit(1164) },
+  { t: 'Strike', f: 'Aftermovie 16:9', k: 'Edicion', src: mixkit(49102), wide: true },
 ];
 ---
 <section class="work" id="trabajos">
@@ -26,21 +26,15 @@ const work: Item[] = [
     </header>
     <ul class="track">
       {work.map((w, i) => (
-        <li class:list={['item', { 'item--wide': w.wide, 'item--low': w.wide && i % 4 === 0 }]}>
+        <li class:list={['item', { 'item--wide': w.wide, 'item--low': w.wide && i % 4 === 3 }]}>
           <div class="screen">
-            {w.ig ? (
-              <iframe src={`https://www.instagram.com/reel/${w.ig}/embed/`} title={`Reel: ${w.f}`} loading="lazy" allowfullscreen></iframe>
-            ) : (
-              <>
-                <video src={w.mp4} muted loop playsinline preload="none"></video>
-                <button class="sound pixel" aria-label="Activar sonido">SND OFF</button>
-              </>
-            )}
-            {!w.ig && <span class="badge pixel">{w.k}</span>}
+            <video src={w.src} muted loop playsinline preload="none"></video>
+            <button class="sound pixel" aria-label="Activar sonido">SND OFF</button>
+            <span class="badge pixel">{w.k}</span>
           </div>
           <div class="meta">
             <h3>{w.t}</h3>
-            {w.ig ? <a href={`https://www.instagram.com/reel/${w.ig}/`} target="_blank" rel="noopener">Instagram ↗</a> : <span>{w.f}</span>}
+            <span>{w.f}</span>
           </div>
         </li>
       ))}
@@ -122,10 +116,8 @@ const work: Item[] = [
   }
   .item--wide .screen { height: calc(var(--h) * .62); border-radius: 14px / 18px; }
   .item:hover .screen { border-color: var(--cyan); }
-  .screen video, .screen iframe { width: 100%; height: 100%; display: block; border: 0; }
-  .screen video { object-fit: cover; }
-  .screen iframe { background: #fff; }
-  .screen:has(video)::after {
+  .screen video { width: 100%; height: 100%; display: block; object-fit: cover; }
+  .screen::after {
     content: ''; position: absolute; inset: 0; pointer-events: none;
     background: repeating-linear-gradient(0deg, rgba(7,17,57,.16) 0 2px, transparent 2px 4px), radial-gradient(120% 90% at 50% 50%, transparent 60%, rgba(7,17,57,.55));
   }
@@ -137,8 +129,7 @@ const work: Item[] = [
   .sound:hover { background: var(--cyan); color: var(--ink); }
   .meta { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding-top: .8rem; }
   .meta h3 { font-size: .95rem; font-weight: 600; }
-  .meta span, .meta a { font-size: .78rem; opacity: .7; }
-  .meta a { color: var(--cyan); opacity: 1; }
+  .meta span { font-size: .78rem; opacity: .7; }
 
   .item--end { align-self: center; width: auto; padding-right: 10vw; display: grid; gap: 1.4rem; justify-items: start; }
   .item--end p { font-size: clamp(1rem, 2.2vw, 1.5rem); line-height: 1.4; }
