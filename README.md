@@ -15,7 +15,7 @@ El hero es una escena 3D interactiva: una nube voladora lleva una tele CRT sobre
 
 ```bash
 npm install
-npm run dev      # http://localhost:4321
+npm run dev       # http://localhost:4321
 npm run build
 ```
 
