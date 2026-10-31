@@ -43,10 +43,16 @@
     rows.forEach(([o, len], r) => ctx.fillRect(Math.round(x + o * u), Math.round(y + r * u), len * u, u));
   };
 
+  let painted = -1;
   const frame = (t: number) => {
+    requestAnimationFrame(frame);
     const y = scrollY;
     vel += ((y - lastY) - vel) * 0.2;
     lastY = y;
+    // en el hero solo hay color plano: se repinta únicamente si cambió el scroll
+    const still = y <= h * 0.4;
+    if (still && y === painted) return;
+    painted = still ? y : -1;
     const max = document.documentElement.scrollHeight - h;
     const [r, g, b] = mix(y / (max || 1));
     ctx.fillStyle = `rgb(${r},${g},${b})`;
@@ -72,10 +78,9 @@
       }
       ctx.globalAlpha = 1;
     }
-    requestAnimationFrame(frame);
   };
 
-  addEventListener('resize', resize);
+  addEventListener('resize', () => { resize(); painted = -1; });
   resize();
   requestAnimationFrame(frame);
 </script>

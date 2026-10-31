@@ -64,12 +64,16 @@ const work: Item[] = [
     section.style.height = `${dist + innerHeight}px`;
     update();
   };
+  const videos = items.map((it) => it.querySelector('video'));
   const update = () => {
-    const p = Math.min(Math.max(-section.getBoundingClientRect().top / (dist || 1), 0), 1);
+    const top = section.getBoundingClientRect().top;
+    const p = Math.min(Math.max(-top / (dist || 1), 0), 1);
     track.style.transform = `translate3d(${-p * dist}px,0,0)`;
     bar.style.transform = `scaleX(${p})`;
     const i = Math.min(items.length - 2, Math.round(p * (items.length - 2)));
     count.textContent = String(i + 1).padStart(2, '0');
+    // los videos empiezan a bajar antes de verse: cuando la sección se acerca, el actual y los dos siguientes
+    if (top < innerHeight * 1.5) for (const v of videos.slice(i, i + 3)) if (v && v.preload !== 'auto') v.preload = 'auto';
   };
   addEventListener('scroll', update, { passive: true });
   addEventListener('resize', layout);

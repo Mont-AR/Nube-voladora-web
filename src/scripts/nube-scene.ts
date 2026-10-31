@@ -867,16 +867,27 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
   resize();
 
   /* ---------------- loop ---------------- */
-  let visible = true;
-  new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(canvas);
+  // fuera de pantalla o con la pestaña oculta el loop se corta del todo (ni rAF ni render)
+  let inView = true, raf = 0;
+  const sync = () => {
+    const run = inView && !document.hidden;
+    if (run && !raf) {
+      timer.update(); // descarta el tiempo pausado para que dt no salte
+      raf = requestAnimationFrame(tick);
+    } else if (!run && raf) {
+      cancelAnimationFrame(raf);
+      raf = 0;
+    }
+  };
+  new IntersectionObserver(([e]) => { inView = e.isIntersecting; sync(); }).observe(canvas);
+  document.addEventListener('visibilitychange', sync);
   let scrollP = 0, offset = 0, osdClock = 0;
   const glow = new THREE.Color(PALETTE.cyan);
   const screenWorld = new THREE.Vector3();
   const camStart = new THREE.Vector3();
 
   const tick = () => {
-    requestAnimationFrame(tick);
-    if (!visible) return;
+    raf = requestAnimationFrame(tick);
     timer.update();
     const dt = Math.min(timer.getDelta(), 0.05);
     const t = (now = timer.getElapsed() - t0);
@@ -972,7 +983,7 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
     composer.render();
   };
   drawOSD(0);
-  tick();
+  sync();
 
   return {
     setChannel,
