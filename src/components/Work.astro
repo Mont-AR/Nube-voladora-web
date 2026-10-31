@@ -1,18 +1,21 @@
 ---
 // src: archivo en public/videos (ej. '/videos/cliente.mp4') o link directo al .mp4 donde esté subido
 // wide: true para horizontales (16:9); sin wide se muestra vertical (9:16)
-// por ahora son videos de muestra de Mixkit (licencia libre)
-type Item = { t: string; f: string; k: string; src: string; wide?: boolean };
+// poster: imagen que se ve hasta que arranca el video
+// los mixkit() son videos de muestra (licencia libre) hasta tener trabajos reales
+type Item = { t: string; f: string; k: string; src: string; poster?: string; wide?: boolean };
 const mixkit = (id: number) => `https://assets.mixkit.co/videos/${id}/${id}-720.mp4`;
+const local = (name: string) => ({ src: `/videos/${name}.mp4`, poster: `/videos/${name}.jpg` });
 const work: Item[] = [
-  { t: 'Marca local', f: 'Pack de Reels', k: 'Contenido', src: mixkit(34487) },
-  { t: 'Moda Pop', f: 'Spot 16:9', k: 'Color', src: mixkit(42298), wide: true },
-  { t: 'Vlog de ruta', f: 'Reel 9:16', k: 'Redes', src: mixkit(32809) },
+  { t: 'Jonny & Betsabet', f: 'Trailer 9:16', k: 'Edicion', ...local('jonny-betsabet') },
+  { t: '¡Azul perfecto!', f: 'Promo 16:9', k: 'Contenido', ...local('azul-perfecto'), wide: true },
+  { t: 'Vení Raquel', f: 'Promo 9:16', k: 'Redes', ...local('veni-raquel') },
   { t: 'Café de altura', f: 'Producto 16:9', k: 'Edicion', src: mixkit(26345), wide: true },
-  { t: 'Bosque adentro', f: 'Short 9:16', k: 'Redes', src: mixkit(39767) },
-  { t: 'Voces', f: 'Entrevista 16:9', k: 'Edicion', src: mixkit(4883), wide: true },
-  { t: 'Marea', f: 'Loop 9:16', k: 'Motion', src: mixkit(1164) },
-  { t: 'Strike', f: 'Aftermovie 16:9', k: 'Edicion', src: mixkit(49102), wide: true },
+  { t: 'Tangourmet', f: 'Reel 9:16', k: 'Contenido', ...local('tangourmet') },
+  { t: 'Dollar Attack!', f: 'Animación 16:9', k: 'Motion', ...local('dollar-attack'), wide: true },
+  { t: 'Reliquias Porteñas', f: 'Mini doc 9:16', k: 'Color', ...local('reliquias-portenas') },
+  // { t: 'Strike', f: 'Aftermovie 16:9', k: 'Edicion', src: mixkit(49102), wide: true },
+  // { t: 'Tango Posta', f: 'Entrevista 9:16', k: 'Edicion', ...local('tango-posta') },
 ];
 ---
 <section class="work" id="trabajos" aria-labelledby="trabajos-title">
@@ -28,7 +31,7 @@ const work: Item[] = [
       {work.map((w, i) => (
         <li class:list={['item', { 'item--wide': w.wide, 'item--low': w.wide && i % 4 === 3 }]}>
           <div class="screen">
-            <video src={w.src} muted loop playsinline preload="none" aria-label={`${w.t}: ${w.f}`}></video>
+            <video src={w.src} poster={w.poster} muted loop playsinline preload="none" aria-label={`${w.t}: ${w.f}`}></video>
             <button class="sound pixel" aria-label="Activar sonido">SND OFF</button>
             <span class="badge pixel" aria-hidden="true">{w.k}</span>
           </div>

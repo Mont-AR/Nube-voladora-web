@@ -4,7 +4,7 @@ import { SITE, WA_LINK } from '../data/site';
 ---
 <footer class="footer">
   <a href="#inicio" class="brand" aria-label="Nube Voladora, volver al inicio"><Logo size={22} /><span class="pixel">NUBE VOLADORA</span></a>
-  <nav aria-label="Redes y contacto">
+  <nav class="hidden" aria-label="Redes y contacto">
     <ul>
       <li><a href={SITE.social.instagram}>Instagram</a></li>
       <li><a href={SITE.social.youtube}>YouTube</a></li>
@@ -17,6 +17,9 @@ import { SITE, WA_LINK } from '../data/site';
 </footer>
 <style>
   /* continúa el degradé magenta del contacto */
+  .hidden {
+    display: none;
+  }
   .footer {
     display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;
     padding: 1.5rem clamp(16px, 5vw, 4rem) 2rem; font-size: .8rem;
