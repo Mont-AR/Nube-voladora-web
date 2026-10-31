@@ -377,7 +377,7 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
 
   // marco crema alrededor de la pantalla
   const scrW = 1.78, scrH = 1.4, scrX = -0.3, scrY = 1.08;
-  const rr = (s: THREE.Shape | THREE.Path, w: number, h: number, r: number) => {
+  const rr = <T extends THREE.Path>(s: T, w: number, h: number, r: number) => {
     s.moveTo(-w / 2 + r, -h / 2);
     s.lineTo(w / 2 - r, -h / 2); s.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + r);
     s.lineTo(w / 2, h / 2 - r); s.quadraticCurveTo(w / 2, h / 2, w / 2 - r, h / 2);
@@ -386,7 +386,7 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
     return s;
   };
   const bezelShape = rr(new THREE.Shape(), scrW + 0.22, scrH + 0.22, 0.2);
-  bezelShape.holes.push(rr(new THREE.Path(), scrW, scrH, 0.16) as THREE.Path);
+  bezelShape.holes.push(rr(new THREE.Path(), scrW, scrH, 0.16));
   const bezel = new THREE.Mesh(new THREE.ExtrudeGeometry(bezelShape, { depth: 0.07, bevelEnabled: true, bevelSize: 0.02, bevelThickness: 0.02, bevelSegments: 3 }), trimMat);
   bezel.position.set(scrX, scrY, 0.7);
   tv.add(bezel);
