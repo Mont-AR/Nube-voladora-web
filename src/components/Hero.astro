@@ -74,7 +74,15 @@ import { CHANNELS } from '../scripts/nube-scene';
   };
   addEventListener('scroll', onScroll, { passive: true });
   onScroll();
-  requestAnimationFrame(() => hero.classList.add('is-loaded'));
+
+  // avisa al loader cuando ya se dibujó el primer cuadro; la intro arranca cuando el loader se va
+  requestAnimationFrame(() => requestAnimationFrame(() => dispatchEvent(new Event('nube:ready'))));
+  const start = () => {
+    scene.restart();
+    hero.classList.add('is-loaded');
+  };
+  if (document.documentElement.classList.contains('is-loading') && !(window as any).nubeLoaded) addEventListener('loader:done', start, { once: true });
+  else start();
 </script>
 
 <style>

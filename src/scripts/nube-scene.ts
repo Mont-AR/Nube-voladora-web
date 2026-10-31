@@ -102,6 +102,7 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
 
   const timer = new THREE.Timer();
   let now = 0;
+  let t0 = 0;
   const sunDir = new THREE.Vector3(0, 0.12, -1).normalize();
 
   /* ---------------- cielo con nubes pixeladas ---------------- */
@@ -878,7 +879,7 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
     if (!visible) return;
     timer.update();
     const dt = Math.min(timer.getDelta(), 0.05);
-    const t = (now = timer.getElapsed());
+    const t = (now = timer.getElapsed() - t0);
 
     const intro = reduced ? 1 : 1 - Math.pow(1 - Math.min(t / 3.4, 1), 3);
     renderer.toneMappingExposure = Math.min(t / 1.4, 1) * 0.92;
@@ -985,6 +986,10 @@ export function createNubeScene(canvas: HTMLCanvasElement) {
     },
     setScroll(p: number) {
       scrollP = p;
+    },
+    // reinicia la intro (cámara, exposición, encendido de la tele) cuando se va el loader
+    restart() {
+      t0 = timer.getElapsed();
     },
   };
 }

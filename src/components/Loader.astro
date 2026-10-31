@@ -1,0 +1,180 @@
+<div class="loader" role="status" aria-label="Cargando sitio">
+  <canvas class="loader__canvas" aria-hidden="true"></canvas>
+  <p class="loader__label pixel" aria-hidden="true">Sintonizando<span class="loader__dots"></span></p>
+  <div class="loader__bar" aria-hidden="true"></div>
+  <p class="loader__pct pixel" aria-hidden="true">00%</p>
+</div>
+
+<script is:inline>
+  // inline para que corra antes que el bundle de three: la tele sintoniza mientras carga la escena
+  (() => {
+    const root = document.documentElement;
+    const el = document.querySelector('.loader');
+    root.classList.add('is-loading');
+
+    const canvas = el.querySelector('canvas');
+    const ctx = canvas.getContext('2d');
+    const dots = el.querySelector('.loader__dots');
+    const pct = el.querySelector('.loader__pct');
+    const bar = el.querySelector('.loader__bar');
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const C = { c: '#fff6d9', l: '#b48cff', m: '#e42a9b', y: '#fff1b0', k: '#61f7e7', i: '#071139' };
+    // nube con tele: t = punta de antena, S = pantalla
+    const SPRITE = [
+      '......t.......t.......',
+      '.......l.....l........',
+      '........l...l.........',
+      '.....mmmmmmmmmmmm.....',
+      '.....mSSSSSSSSmym.....',
+      '.....mSSSSSSSSmmm.....',
+      '.....mSSSSSSSSmym.....',
+      '.....mSSSSSSSSmmm.....',
+      '.....mSSSSSSSSmmm.....',
+      '..cc.mmmmmmmmmmmm.cc..',
+      '.cccccccccccccccccccc.',
+      'cccccccccccccccccccccc',
+      'cccccccccccccccccccccc',
+      '.llllllllllllllllllll.',
+    ];
+    const BARS = ['#fff6d9', '#fff1b0', '#61f7e7', '#e8fffb', '#e42a9b', '#ed7e93', '#b48cff', '#43105f'];
+    const NOISE = ['#071139', '#120d50', '#b48cff', '#fff6d9', '#43105f'];
+    const W = 60, H = 22, SX = 19, SY = 4;
+    const BLOCKS = 16;
+
+    bar.innerHTML = '<span></span>'.repeat(BLOCKS);
+    const blocks = [...bar.children];
+
+    let u = 6;
+    const resize = () => {
+      u = Math.max(3, Math.min(8, Math.floor((innerWidth * 0.9) / W)));
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      canvas.width = W * u * dpr;
+      canvas.height = H * u * dpr;
+      canvas.style.width = W * u + 'px';
+      canvas.style.height = H * u + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize();
+    addEventListener('resize', resize);
+
+    const lines = Array.from({ length: 26 }, () => ({
+      x: Math.random() * W, y: Math.floor(Math.random() * H), len: 2 + Math.floor(Math.random() * 5),
+      v: 18 + Math.random() * 26, c: ['l', 'k', 'c'][Math.floor(Math.random() * 3)], a: 0.25 + Math.random() * 0.5,
+    }));
+    const screen = new Array(8 * 5).fill('#071139');
+
+    let p = 0, ready = false, leaving = false, raf = 0, t0 = 0, last = 0, noiseClock = 0;
+
+    const draw = (now) => {
+      // el timestamp de rAF puede ser anterior a performance.now(): el reloj arranca en el primer cuadro
+      if (!t0) t0 = last = now;
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+      const t = (now - t0) / 1000;
+
+      // progreso: avanza solo hasta ~92% y completa cuando la escena avisa que está lista
+      const target = ready ? 1 : 0.92 * (1 - Math.exp(-t / 1.8));
+      p += (target - p) * (ready ? 0.14 : 0.05);
+
+      ctx.clearRect(0, 0, W * u, H * u);
+
+      for (const s of lines) {
+        if (!reduced) s.x -= s.v * dt;
+        if (s.x + s.len < 0) { s.x = W + Math.random() * 10; s.y = Math.floor(Math.random() * H); }
+        ctx.globalAlpha = s.a;
+        ctx.fillStyle = C[s.c];
+        ctx.fillRect(Math.round(s.x) * u, s.y * u, s.len * u, u);
+      }
+      ctx.globalAlpha = 1;
+
+      // la pantalla pasa de estática a barras de color según el progreso
+      noiseClock += dt;
+      if (noiseClock > 0.07) {
+        noiseClock = 0;
+        for (let i = 0; i < screen.length; i++) {
+          screen[i] = Math.random() < p * p ? BARS[i % 8] : NOISE[Math.floor(Math.random() * NOISE.length)];
+        }
+      }
+
+      const bob = reduced ? 0 : Math.round(Math.sin(t * 2.6));
+      const blink = Math.floor(t * 3) % 2 ? C.k : C.c;
+      SPRITE.forEach((row, y) => {
+        for (let x = 0; x < row.length; x++) {
+          const ch = row[x];
+          if (ch === '.') continue;
+          ctx.fillStyle = ch === 'S' ? screen[(y - 4) * 8 + (x - 6)] : ch === 't' ? blink : C[ch];
+          ctx.fillRect((SX + x) * u, (SY + y + bob) * u, u, u);
+        }
+      });
+
+      const on = Math.round(p * BLOCKS);
+      blocks.forEach((b, i) => b.classList.toggle('is-on', i < on));
+      pct.textContent = String(Math.min(99, Math.floor(p * 100))).padStart(2, '0') + '%';
+      dots.textContent = '.'.repeat(Math.floor(t * 2.5) % 4);
+
+      if (ready && p > 0.99 && t > 1 && !leaving) leave();
+      raf = requestAnimationFrame(draw);
+    };
+
+    const leave = () => {
+      leaving = true;
+      pct.textContent = '100%';
+      window.nubeLoaded = true;
+      dispatchEvent(new Event('loader:done'));
+      el.classList.add('is-out');
+      setTimeout(() => {
+        cancelAnimationFrame(raf);
+        removeEventListener('resize', resize);
+        el.remove();
+        root.classList.remove('is-loading');
+      }, reduced ? 400 : 800);
+    };
+
+    // listo = la escena 3D dibujó su primer cuadro y las fuentes cargaron
+    const scene = new Promise((r) => addEventListener('nube:ready', r, { once: true }));
+    Promise.all([scene, document.fonts ? document.fonts.ready : null]).then(() => (ready = true));
+    // por si la escena falla o la red es muy lenta
+    setTimeout(() => (ready = true), 12000);
+
+    raf = requestAnimationFrame(draw);
+  })();
+</script>
+
+<style>
+  .loader { display: none; }
+  :global(html.is-loading) { overflow: hidden; }
+  :global(html.is-loading) .loader {
+    position: fixed; inset: 0; z-index: 200; display: grid; place-content: center; justify-items: center; gap: 1.4rem;
+    padding: 0 16px; background: var(--ink); color: var(--cream);
+  }
+  .loader::after { content: ''; position: absolute; inset: 0; background: var(--cream); opacity: 0; pointer-events: none; }
+  .loader__canvas {
+    display: block; max-width: 100%; image-rendering: pixelated;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+  }
+  .loader__label { font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; color: var(--cyan); }
+  .loader__dots { display: inline-block; width: 3ch; text-align: left; }
+  .loader__bar { display: flex; gap: 4px; padding: 4px; border: 3px solid var(--lavender); }
+  .loader__bar :global(span) { width: clamp(8px, 2.2vw, 12px); height: 14px; background: rgba(180, 140, 255, .15); }
+  .loader__bar :global(span.is-on) { background: var(--cyan); box-shadow: 0 0 8px rgba(97, 247, 231, .6); }
+  .loader__pct { font-size: .55rem; color: var(--lavender); }
+
+  /* salida: la tele se apaga (colapsa a una línea y luego a un punto) */
+  .loader.is-out { animation: crt-off .75s cubic-bezier(.6, 0, .4, 1) forwards; }
+  .loader.is-out::after { animation: crt-flash .75s linear forwards; }
+  @keyframes crt-off {
+    0% { transform: none; }
+    45% { transform: scale(1, .004); }
+    75% { transform: scale(.002, .004); opacity: 1; }
+    100% { transform: scale(0, 0); opacity: 0; }
+  }
+  @keyframes crt-flash { 0% { opacity: 0; } 40%, 100% { opacity: 1; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loader.is-out { animation: fade-out .4s ease forwards; }
+    .loader.is-out::after { animation: none; }
+    @keyframes fade-out { to { opacity: 0; } }
+  }
+</style>
